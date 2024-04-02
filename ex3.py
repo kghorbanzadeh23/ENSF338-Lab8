@@ -1,3 +1,4 @@
+
 class GraphNode:
     def __init__(self, data):
         self.data = data
@@ -69,39 +70,74 @@ class Graph:
             print("File not found.")
             return None
 
-    def find(self, parent, i):
-        if parent[i] == i:
-            return i
-        return self.find(parent, parent[i])
+    def find(self, parent, node):
+        if parent[node] == node:
+            return node
+        return self.find(parent, parent[node])
 
-    def apply_union(self, parent, rank, x, y):
-        xroot = self.find(parent, x)
-        yroot = self.find(parent, y)
-        if rank[xroot] < rank[yroot]:
-            parent[xroot] = yroot
-        elif rank[xroot] > rank[yroot]:
-            parent[yroot] = xroot
+    def union(self, parent, rank, node1, node2):
+        root1 = self.find(parent, node1)
+        root2 = self.find(parent, node2)
+
+        if rank[root1] < rank[root2]:
+            parent[root1] = root2
+        elif rank[root1] > rank[root2]:
+            parent[root2] = root1
         else:
-            parent[yroot] = xroot
-            rank[xroot] += 1
+            parent[root2] = root1
+            rank[root1] += 1
 
-    def kruskal_algo(self):
-        result = []
-        i, e = 0, 0
-        self.adjacency_list = sorted(self.adjacency_list, key=lambda item: item[2])
-        parent = []
-        rank = []
-        for node in range(self.V):
-            parent.append(node)
-            rank.append(0)
-        while e < self.V - 1:
-            u, v, w = self.adjacency_list[i]
-            i = i + 1
-            x = self.find(parent, u)
-            y = self.find(parent, v)
-            if x != y:
-                e = e + 1
-                result.append([u, v, w])
-                self.apply_union(parent, rank, x, y)
-        for u, v, weight in result:
-            print("%d - %d: %d" % (u, v, weight))
+    def mst(self):
+        parent = {}
+        rank = {}
+        result = Graph()
+
+        for node in self.adjacency_list:
+            parent[node] = node
+            rank[node] = 0
+
+        edges = []
+        for node in self.adjacency_list:
+            for neighbor, weight in self.adjacency_list[node]:
+                edges.append((weight, node, neighbor))
+
+        edges.sort(key=lambda x: x[0])
+
+        for edge in edges:
+            weight, node1, node2 = edge
+            root1 = self.find(parent, node1)
+            root2 = self.find(parent, node2)
+
+            if root1 != root2:
+                result.addNode(node1.data)
+                result.addNode(node2.data)
+                result.addEdge(node1, node2, weight)
+                self.union(parent, rank, root1, root2)
+
+        return result
+
+# Create a graph
+g = Graph()
+
+# Add nodes
+nodes = {}
+nodes['A'] = g.addNode('A')
+nodes['B'] = g.addNode('B')
+nodes['C'] = g.addNode('C')
+nodes['D'] = g.addNode('D')
+nodes['E'] = g.addNode('E')
+
+# Add edges
+g.addEdge(nodes['A'], nodes['B'], 4)
+g.addEdge(nodes['A'], nodes['C'], 2)
+g.addEdge(nodes['A'], nodes['D'], 5)
+g.addEdge(nodes['B'], nodes['D'], 6)
+g.addEdge(nodes['B'], nodes['E'], 3)
+g.addEdge(nodes['C'], nodes['D'], 1)
+g.addEdge(nodes['D'], nodes['E'], 7)
+
+# Find minimum spanning tree
+mst = g.mst()
+
+# Print the edges of the minimum spanning tree
+print(mst.adjacency_list)
