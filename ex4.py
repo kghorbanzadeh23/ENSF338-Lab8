@@ -6,6 +6,7 @@ sys.setrecursionlimit(5000)
 class GraphNode:
     def __init__(self, data):
         self.data = data
+        
     def equals(self, node):
         if(node.data == self.data):
             return True

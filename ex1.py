@@ -1,15 +1,25 @@
 class GraphNode:
     def __init__(self, data):
         self.data = data
-
+        
+    def equals(self, node):
+        if(node.data == self.data):
+            return True
+        return False
 
 class Graph:
     def __init__(self):
         self.adjacency_list = {}
+        self.nodeList = []
 
     def addNode(self, data):
         node = GraphNode(data)
+        for nodeOb in self.nodeList:
+            if node.equals(nodeOb):
+                return nodeOb
+
         self.adjacency_list[node] = []
+        self.nodeList.append(node)
         return node
 
     def removeNode(self, node):
@@ -30,7 +40,7 @@ class Graph:
 
     def importFromFile(self, file):
         self.adjacency_list = {}
-
+        self.nodeList = []
         try:
             with open(file, 'r') as f:
                 lines = f.readlines()
@@ -49,9 +59,9 @@ class Graph:
                         parts = line.split('--')
                         if len(parts) == 2:
                             nodes = [n.strip() for n in parts]
-                            weight = int(line.split('weight=')[1].split(']')[0].strip())
-                            n1 = self.addNode(nodes[0])
-                            n2 = self.addNode(nodes[1])
+                            weight = int(line.split('weight=')[1].split(']')[0].strip())     
+                            n1 = self.addNode(int( nodes[0]))
+                            n2 = self.addNode(int((nodes[1])[0:-13]))
                             self.addEdge(n1, n2, weight)
                     else:
                         # If weight is not specified (implicitly 1)
@@ -63,11 +73,12 @@ class Graph:
                             self.addEdge(n1, n2)
 
             print("Graph imported successfully.")
-            return self
+            return self.nodeList
 
         except FileNotFoundError:
             print("File not found.")
             return None
+
 
 
 # Testing the Graph class
@@ -90,7 +101,8 @@ graph.addEdge(node4, node3, 6)
 graph.removeEdge(node1, node2)
 
 # Import from file
-imported_graph = Graph().importFromFile("random.dot")
+imported_graph = Graph()
+imported_graph.importFromFile("random.dot")
 
 # Print the adjacency list
 print("Original Graph:")

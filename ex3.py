@@ -3,14 +3,24 @@ class GraphNode:
     def __init__(self, data):
         self.data = data
 
+    def equals(self, node):
+        if(node.data == self.data):
+            return True
+        return False
 
 class Graph:
     def __init__(self):
         self.adjacency_list = {}
+        self.nodeList = []
 
     def addNode(self, data):
         node = GraphNode(data)
+        for nodeOb in self.nodeList:
+            if node.equals(nodeOb):
+                return nodeOb
+
         self.adjacency_list[node] = []
+        self.nodeList.append(node)
         return node
 
     def removeNode(self, node):
@@ -20,6 +30,12 @@ class Graph:
                 self.adjacency_list[key] = [n for n in self.adjacency_list[key] if n != node]
 
     def addEdge(self, n1, n2, weight=1):
+        for nodeOb in self.nodeList:
+            if n1.equals(nodeOb):
+                n1 = nodeOb
+            if n2.equals(nodeOb):
+                n2 = nodeOb
+
         if n1 in self.adjacency_list and n2 in self.adjacency_list:
             self.adjacency_list[n1].append((n2, weight))
             self.adjacency_list[n2].append((n1, weight))
@@ -140,4 +156,5 @@ g.addEdge(nodes['D'], nodes['E'], 7)
 mst = g.mst()
 
 # Print the edges of the minimum spanning tree
-print(mst.adjacency_list)
+for node in mst.adjacency_list:
+    print(len(mst.adjacency_list[node]))
